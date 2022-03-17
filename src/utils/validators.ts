@@ -1,4 +1,4 @@
-import { CardErrorMessage } from "../interface/CreditCard";
+import { CardError, CVCError, ExpiryDateError } from "../interface/CreditCard";
 import { getCardTypeByValue } from "./cardTypes";
 
 const MONTH_REGEX = /(0[1-9]|1[0-2])/;
@@ -41,7 +41,7 @@ export const validateLuhn = (cardNumber: string) => {
 
 export const getCardNumberError = (
   cardNumber: string,
-  errorMessages?: CardErrorMessage
+  errorMessages?: CardError
 ) => {
   if (!cardNumber) {
     return typeof errorMessages !== "undefined"
@@ -69,10 +69,12 @@ export const getCardNumberError = (
 
 export const getExpiryDateError = (
   expiryDate: string,
-  { errorMessages = {} as any } = {}
+  errorMessages?: ExpiryDateError
 ) => {
   if (!expiryDate) {
-    return errorMessages.emptyExpiryDate || EMPTY_EXPIRY_DATE;
+    return typeof errorMessages !== "undefined"
+      ? errorMessages.emptyExpiryDate
+      : EMPTY_EXPIRY_DATE;
   }
 
   const rawExpiryDate = expiryDate.replace(" / ", "").replace("/", "");
@@ -81,31 +83,40 @@ export const getExpiryDateError = (
     const month = rawExpiryDate.slice(0, 2);
     const year = `20${rawExpiryDate.slice(2, 4)}`;
     if (!MONTH_REGEX.test(month)) {
-      return errorMessages.monthOutOfRange || MONTH_OUT_OF_RANGE;
+      return typeof errorMessages !== "undefined"
+        ? errorMessages.monthOutOfRange
+        : MONTH_OUT_OF_RANGE;
     }
     if (parseInt(year) < new Date().getFullYear()) {
-      return errorMessages.yearOutOfRange || YEAR_OUT_OF_RANGE;
+      return typeof errorMessages !== "undefined"
+        ? errorMessages.yearOutOfRange
+        : YEAR_OUT_OF_RANGE;
     }
     if (
       parseInt(year) === new Date().getFullYear() &&
       parseInt(month) < new Date().getMonth() + 1
     ) {
-      return errorMessages.dateOutOfRange || DATE_OUT_OF_RANGE;
+      return typeof errorMessages !== "undefined"
+        ? errorMessages.dateOutOfRange
+        : DATE_OUT_OF_RANGE;
     }
 
     return;
   }
-  return errorMessages.invalidExpiryDate || INVALID_EXPIRY_DATE;
+  return typeof errorMessages !== "undefined"
+    ? errorMessages.invalidExpiryDate
+    : INVALID_EXPIRY_DATE;
 };
 
-export const getCVCError = (
-  cvc: string,
-  { errorMessages = {} as any } = {}
-) => {
+export const getCVCError = (cvc: string, errorMessages?: CVCError) => {
   if (!cvc) {
-    return errorMessages.emptyCVC || EMPTY_CVC;
+    return typeof errorMessages !== "undefined"
+      ? errorMessages.emptyCVC
+      : EMPTY_CVC;
   }
   if (cvc.length < 3) {
-    return errorMessages.invalidCVC || INVALID_CVC;
+    return typeof errorMessages !== "undefined"
+      ? errorMessages.invalidCVC
+      : INVALID_CVC;
   }
 };

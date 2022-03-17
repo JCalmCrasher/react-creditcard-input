@@ -49,6 +49,7 @@ describe("Card number", () => {
     fireEvent.change(inputEl, { target: { value: "" } });
 
     const errorEl = screen.getByTestId("cardNumberErrorEl");
+    // custom error might not contain text but other descriptive stuff
     expect(errorEl).toBeInTheDocument();
   });
 });

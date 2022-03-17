@@ -1,5 +1,5 @@
 import { useRef, useCallback, useState } from "react";
-import { CardErrorMessage } from "../interface/CreditCard";
+import { CardError, CVCError, ExpiryDateError } from "../interface/CreditCard";
 import { getCardTypeByValue, SINGLE_CARD_TYPE } from "../utils/cardTypes";
 import { formatCardNumber, formatExpiry } from "../utils/formatter";
 import {
@@ -9,7 +9,11 @@ import {
   getExpiryDateError,
 } from "../utils/validators";
 
-function useCreditCardInput(errorMessage?: CardErrorMessage) {
+function useCreditCardInput(
+  cardErrorMessage?: CardError,
+  expiryDateErrorMessage?: ExpiryDateError,
+  CVCErrorMessage?: CVCError
+) {
   /*===State, Refs & Utility Fns===*/
   const cardNumberField = useRef<HTMLInputElement>();
   const expiryDateField = useRef<HTMLInputElement>();
@@ -92,8 +96,9 @@ function useCreditCardInput(errorMessage?: CardErrorMessage) {
 
         props.onChange && props.onChange(e);
         let cardNumberError;
-
-        typeof errorMessage !== "undefined"?cardNumberError = getCardNumberError(cardNumber, errorMessage):cardNumberError = getCardNumberError(cardNumber);
+        typeof cardErrorMessage !== "undefined"
+          ? (cardNumberError = getCardNumberError(cardNumber, cardErrorMessage))
+          : (cardNumberError = getCardNumberError(cardNumber));
 
         if (!cardNumberError) {
           expiryDateField.current && expiryDateField.current.focus();
@@ -101,9 +106,10 @@ function useCreditCardInput(errorMessage?: CardErrorMessage) {
 
         setInputError("cardNumber", cardNumberError);
         props.onError && props.onError(cardNumberError);
+        console.log(cardErrorMessage);
       };
     },
-    [setInputTouched, setInputError]
+    [setInputTouched, cardErrorMessage, setInputError]
   );
 
   const handleFocusCardNumber = useCallback((props = {}) => {
@@ -195,10 +201,15 @@ function useCreditCardInput(errorMessage?: CardErrorMessage) {
 
         props.onChange && props.onChange(e);
 
-        const expiryDateError = getExpiryDateError(
-          //@ts-ignore
-          expiryDateField.current.value
-        );
+        let expiryDateError;
+        typeof expiryDateErrorMessage !== "undefined"
+          ? (expiryDateError = getExpiryDateError(
+              expiryDateField?.current?.value || "",
+              expiryDateErrorMessage
+            ))
+          : (expiryDateError = getExpiryDateError(
+              expiryDateField?.current?.value || ""
+            ));
 
         if (!expiryDateError) {
           cvcField.current && cvcField.current.focus();
@@ -263,7 +274,10 @@ function useCreditCardInput(errorMessage?: CardErrorMessage) {
 
         props.onChange && props.onChange(e);
 
-        const cvcError = getCVCError(cvc);
+        let cvcError;
+        typeof CVCErrorMessage !== "undefined"
+          ? (cvcError = getCVCError(cvc, CVCErrorMessage))
+          : (cvcError = getCVCError(cvc));
 
         setInputError("cvc", cvcError);
         props.onError && props.onError(cvcError);

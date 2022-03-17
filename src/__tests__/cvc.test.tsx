@@ -8,6 +8,15 @@ describe("CVC Tests", () => {
     fireEvent.change(inputEl, { target: { value: "12" } });
 
     const errorEl = screen.getByTestId("cvcErrorEl");
-    expect(errorEl.textContent).toBe("CVC is invalid");
+    expect(errorEl).toBeInTheDocument();
+  });
+
+  it("should show error text if CVC is not provided", () => {
+    render(<App />);
+    const inputEl: HTMLInputElement = screen.getByTestId("cvcEl");
+    fireEvent.change(inputEl, { target: { value: "" } });
+
+    const errorEl = screen.getByTestId("cvcErrorEl");
+    expect(errorEl).toBeInTheDocument();
   });
 });

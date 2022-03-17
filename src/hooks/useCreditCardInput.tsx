@@ -1,4 +1,5 @@
 import { useRef, useCallback, useState } from "react";
+import { CardErrorMessage } from "../interface/CreditCard";
 import { getCardTypeByValue, SINGLE_CARD_TYPE } from "../utils/cardTypes";
 import { formatCardNumber, formatExpiry } from "../utils/formatter";
 import {
@@ -8,7 +9,7 @@ import {
   getExpiryDateError,
 } from "../utils/validators";
 
-function useCreditCardInput() {
+function useCreditCardInput(errorMessage?: CardErrorMessage) {
   /*===State, Refs & Utility Fns===*/
   const cardNumberField = useRef<HTMLInputElement>();
   const expiryDateField = useRef<HTMLInputElement>();
@@ -90,8 +91,9 @@ function useCreditCardInput() {
         }
 
         props.onChange && props.onChange(e);
+        let cardNumberError;
 
-        const cardNumberError = getCardNumberError(cardNumber);
+        typeof errorMessage !== "undefined"?cardNumberError = getCardNumberError(cardNumber, errorMessage):cardNumberError = getCardNumberError(cardNumber);
 
         if (!cardNumberError) {
           expiryDateField.current && expiryDateField.current.focus();

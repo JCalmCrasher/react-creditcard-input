@@ -1,3 +1,4 @@
+import { CardErrorMessage } from "../interface/CreditCard";
 import { getCardTypeByValue } from "./cardTypes";
 
 const MONTH_REGEX = /(0[1-9]|1[0-2])/;
@@ -40,10 +41,12 @@ export const validateLuhn = (cardNumber: string) => {
 
 export const getCardNumberError = (
   cardNumber: string,
-  { errorMessages = {} as any } = {}
+  errorMessages?: CardErrorMessage
 ) => {
   if (!cardNumber) {
-    return errorMessages.emptyCardNumber || EMPTY_CARD_NUMBER;
+    return typeof errorMessages !== "undefined"
+      ? errorMessages.emptyCardNumber
+      : EMPTY_CARD_NUMBER;
   }
 
   const rawCardNumber = cardNumber.replace(/\s/g, "");
@@ -59,7 +62,9 @@ export const getCardNumberError = (
       return isLuhnValid;
     }
   }
-  return errorMessages.invalidCardNumber || INVALID_CARD_NUMBER;
+  return typeof errorMessages !== "undefined"
+    ? errorMessages.invalidCardNumber
+    : INVALID_CARD_NUMBER;
 };
 
 export const getExpiryDateError = (

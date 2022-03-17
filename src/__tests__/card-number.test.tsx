@@ -40,6 +40,15 @@ describe("Card number", () => {
     fireEvent.change(inputEl, { target: { value: "54233320332990" } });
 
     const errorEl = screen.getByTestId("cardNumberErrorEl");
-    expect(errorEl.textContent).toBe("Card number is invalid");
+    expect(errorEl).toBeInTheDocument();
+  });
+
+  it("should show error text if card number is not provided", () => {
+    render(<App />);
+    const inputEl: HTMLInputElement = screen.getByPlaceholderText(PLACEHOLDER);
+    fireEvent.change(inputEl, { target: { value: "" } });
+
+    const errorEl = screen.getByTestId("cardNumberErrorEl");
+    expect(errorEl).toBeInTheDocument();
   });
 });
